@@ -1,0 +1,138 @@
+# generic
+
+SELECT DISTINCT ?measureShortName ?cloc ?tsn1 ?tsn2 ?sys ?bv ?mv ?gl ?sx ?rng
+WHERE { 
+	?ts1 rdf:type co:TimeSeries . ?ts1 co:hasMeasure ?measure. ?measure co:hasMeasureName ?measureName.
+	?ts2 rdf:type co:TimeSeries . ?ts2 co:hasMeasure ?measure. 
+	bind( REPLACE( str( ?measureName ), ".*#", "" ) as ?measureShortName )
+	FILTER ( ?measureShortName IN ( "anger", "disgust", "fear", "happiness", "neutralState", "sadness", "surprise" ) )
+	
+	?ts1 co:hasObservableInformation/co:hasRecording/co:hasParticipation ?p1 .
+	?ts2 co:hasObservableInformation/co:hasRecording/co:hasParticipation ?p1 .
+
+	?prop1 pc:hasKey "cameraLocation" .
+	?prop1 pc:hasValue ?cloc1 .
+	?prop2 pc:hasKey "cameraLocation" .
+	?prop2 pc:hasValue ?cloc2 .
+	FILTER ( str( ?cloc1 ) < str( ?cloc2 ) )
+	?ts1 pc:hasProperty ?prop1 .
+	?ts2 pc:hasProperty ?prop2 .
+	bind( concat( str( ?cloc1 ), ":", str( ?cloc2 ) ) as ?cloc )
+
+	?ts1 co:timeSeriesSource ?tsn1. 
+	?ts2 co:timeSeriesSource ?tsn2. 	
+	FILTER ( str( ?tsn1 ) < str( ?tsn2 ) )
+
+    ?ts1 pc:hasProperty ?prop1sys .
+	?ts2 pc:hasProperty ?prop2sys .
+	?prop1sys pc:hasKey "system" .
+	?prop2sys pc:hasKey "system" .
+	?prop1sys pc:hasValue ?sys .
+	?prop2sys pc:hasValue ?sys .
+
+    ?ts1 pc:hasProperty ?prop1bv .
+	?ts2 pc:hasProperty ?prop2bv .
+	?prop1bv pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasBeardValue" .
+	?prop2bv pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasBeardValue" .
+	?prop1bv pc:hasValue ?bv .
+	?prop2bv pc:hasValue ?bv .
+
+    ?ts1 pc:hasProperty ?prop1mv .
+	?ts2 pc:hasProperty ?prop2mv .
+	?prop1mv pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasMoustacheValue" .
+	?prop2mv pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasMoustacheValue" .
+	?prop1mv pc:hasValue ?mv .
+	?prop2mv pc:hasValue ?mv .
+
+    ?ts1 pc:hasProperty ?prop1gl .
+	?ts2 pc:hasProperty ?prop2gl .
+	?prop1gl pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasGlasses" .
+	?prop2gl pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasGlasses" .
+	?prop1gl pc:hasValue ?gl .
+	?prop2gl pc:hasValue ?gl .
+
+    ?ts1 pc:hasProperty ?prop1sx .
+	?ts2 pc:hasProperty ?prop2sx .
+	?prop1sx pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology#hasSex" .
+	?prop2sx pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology#hasSex" .
+	?prop1sx pc:hasValue ?sx .
+	?prop2sx pc:hasValue ?sx .
+
+    ?ts1 pc:hasProperty ?prop1rng .
+	?ts2 pc:hasProperty ?prop2rng .
+	?prop1rng pc:hasKey "hasRange" .
+	?prop2rng pc:hasKey "hasRange" .
+	?prop1rng pc:hasValue ?rng .
+	?prop2rng pc:hasValue ?rng .
+}
+
+# rearranged
+
+SELECT DISTINCT ?sxs ?bvs ?mvs ?gl ?measureShortName ?sys ?rng ?cloc ?tsn1 ?tsn2
+WHERE { 
+	?ts1 rdf:type co:TimeSeries . ?ts1 co:hasMeasure ?measure. ?measure co:hasMeasureName ?measureName.
+	?ts2 rdf:type co:TimeSeries . ?ts2 co:hasMeasure ?measure. 
+	bind( REPLACE( str( ?measureName ), ".*#", "" ) as ?measureShortName )
+	FILTER ( ?measureShortName IN ( "anger", "disgust", "fear", "happiness", "neutralState", "sadness", "surprise" ) )
+	
+	?ts1 co:hasObservableInformation/co:hasRecording/co:hasParticipation ?p1 .
+	?ts2 co:hasObservableInformation/co:hasRecording/co:hasParticipation ?p1 .
+
+	?prop1 pc:hasKey "cameraLocation" .
+	?prop1 pc:hasValue ?cloc1 .
+	?prop2 pc:hasKey "cameraLocation" .
+	?prop2 pc:hasValue ?cloc2 .
+	FILTER ( str( ?cloc1 ) < str( ?cloc2 ) )
+	?ts1 pc:hasProperty ?prop1 .
+	?ts2 pc:hasProperty ?prop2 .
+	bind( concat( str( ?cloc1 ), ":", str( ?cloc2 ) ) as ?cloc )
+
+	?ts1 co:timeSeriesSource ?tsn1. 
+	?ts2 co:timeSeriesSource ?tsn2. 	
+	FILTER ( str( ?tsn1 ) < str( ?tsn2 ) )
+
+    ?ts1 pc:hasProperty ?prop1sys .
+	?ts2 pc:hasProperty ?prop2sys .
+	?prop1sys pc:hasKey "system" .
+	?prop2sys pc:hasKey "system" .
+	?prop1sys pc:hasValue ?sys .
+	?prop2sys pc:hasValue ?sys .
+
+    ?ts1 pc:hasProperty ?prop1bv .
+	?ts2 pc:hasProperty ?prop2bv .
+	?prop1bv pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasBeardValue" .
+	?prop2bv pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasBeardValue" .
+	?prop1bv pc:hasValue ?bv .
+	?prop2bv pc:hasValue ?bv .
+	bind( REPLACE( str( ?bv ), ".*#", "" ) as ?bvs )
+
+    ?ts1 pc:hasProperty ?prop1mv .
+	?ts2 pc:hasProperty ?prop2mv .
+	?prop1mv pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasMoustacheValue" .
+	?prop2mv pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasMoustacheValue" .
+	?prop1mv pc:hasValue ?mv .
+	?prop2mv pc:hasValue ?mv .
+	bind( REPLACE( str( ?mv ), ".*#", "" ) as ?mvs )
+
+    ?ts1 pc:hasProperty ?prop1gl .
+	?ts2 pc:hasProperty ?prop2gl .
+	?prop1gl pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasGlasses" .
+	?prop2gl pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology/models/appearanceOcclusion#hasGlasses" .
+	?prop1gl pc:hasValue ?gl .
+	?prop2gl pc:hasValue ?gl .
+
+    ?ts1 pc:hasProperty ?prop1sx .
+	?ts2 pc:hasProperty ?prop2sx .
+	?prop1sx pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology#hasSex" .
+	?prop2sx pc:hasKey "http://www.semanticweb.org/GRISERA/contextualOntology#hasSex" .
+	?prop1sx pc:hasValue ?sx .
+	?prop2sx pc:hasValue ?sx .
+	bind( REPLACE( str( ?sx ), ".*#", "" ) as ?sxs )
+
+    ?ts1 pc:hasProperty ?prop1rng .
+	?ts2 pc:hasProperty ?prop2rng .
+	?prop1rng pc:hasKey "hasRange" .
+	?prop2rng pc:hasKey "hasRange" .
+	?prop1rng pc:hasValue ?rng .
+	?prop2rng pc:hasValue ?rng .
+}

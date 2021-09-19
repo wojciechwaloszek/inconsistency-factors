@@ -1,0 +1,250 @@
+# query 5.2.1 (condition 2) 
+# determine whether there exists a pair (at least one) of time series 
+# which (1) are connected to the same measure with hasMeasurerole, which ensures that they regard to the same emotional state, 
+# and (2) are connected with the sameParticipationindividual with the appropriate chain of roles so we are sure that they
+# concern a specific person in the given time period and have the values of the data points from thesame range
+
+SELECT ?ts1 ?ts2
+WHERE {
+	?ts1 co:hasObservableInformation/co:hasRecording/co:hasParticipation ?p1 .
+	?ts2 co:hasObservableInformation/co:hasRecording/co:hasParticipation ?p1 .
+	?ts1 co:hasMeasure ?m1 .
+	?ts2 co:hasMeasure ?m1 .
+}
+
+# query 3.2.1 (condition 3) 
+# unifying the form of properties 
+# during this step all the potential consistency variables and inconsistency factors 
+# are converted into individuals of the concept \textit{Property}
+
+# properties of time series
+
+CONSTRUCT { ?prop rdf:type :PotentialCVProperty. ?prop rdf:type :PotentialIFProperty }
+WHERE { ?ts rdf:type co:TimeSeries . ?ts pc:hasProperty ?prop }
+
+# properties of individuals connected with time series
+
+CONSTRUCT { ?ts pc:hasProperty ?prop . ?prop rdf:type :PotentialCVProperty. ?prop rdf:type :PotentialIFProperty }
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation ?o . 
+	?o pc:hasProperty ?prop .
+}
+
+CONSTRUCT { ?ts pc:hasProperty ?prop . ?prop rdf:type :PotentialCVProperty. ?prop rdf:type :PotentialIFProperty }
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording ?o . 
+	?o pc:hasProperty ?prop .
+}
+
+CONSTRUCT { ?ts pc:hasProperty ?prop . ?prop rdf:type :PotentialCVProperty. ?prop rdf:type :PotentialIFProperty }
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording/co:hasRegisteredChannel ?o . 
+	?o pc:hasProperty ?prop .
+}
+
+CONSTRUCT { ?ts pc:hasProperty ?prop . ?prop rdf:type :PotentialCVProperty. ?prop rdf:type :PotentialIFProperty }
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording/co:hasRegisteredChannel/co:hasRegisteredData ?o . 
+	?o pc:hasProperty ?prop .
+}
+
+# predefined properties of individuals connected with time series
+
+CONSTRUCT { 
+	?ts pc:hasProperty ?np . ?np rdf:type :PotentialCVProperty. ?np rdf:type :PotentialIFProperty .
+	?np pc:hasKey ?pk . ?np pc:hasValue ?pv
+}
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation ?o . 
+	?o co:hasModality ?m .
+	bind(IRI(concat(xsd:string(?ts),"_hasModality")) as ?np)
+	bind(str(co:hasModality) as ?pk)
+	bind(str(?m) as ?pv)
+}
+
+CONSTRUCT { 
+	?ts pc:hasProperty ?np . ?np rdf:type :PotentialCVProperty. ?np rdf:type :PotentialIFProperty .
+	?np pc:hasKey ?pk . ?np pc:hasValue ?pv
+}
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation ?o . 
+	?o co:hasLifeActivity ?m .
+	bind(IRI(concat(xsd:string(?ts),"_hasLifeActivity")) as ?np)
+	bind(str(co:hasLifeAcitivity) as ?pk)
+	bind(str(?m) as ?pv)
+}
+
+CONSTRUCT { 
+	?ts pc:hasProperty ?np . ?np rdf:type :PotentialCVProperty. ?np rdf:type :PotentialIFProperty .
+	?np pc:hasKey ?pk . ?np pc:hasValue ?pv
+}
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording/co:hasRegisteredChannel/co:hasChannel ?c . 
+	bind(IRI(concat(xsd:string(?ts),"_hasChannel")) as ?np)
+	bind(str(co:Channel) as ?pk)
+	bind(str(?c) as ?pv)
+}
+
+# properties of individuals connected with time series - IFs
+
+CONSTRUCT { ?ts pc:hasProperty ?prop . ?prop rdf:type :PotentialIFProperty }
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording/co:hasParticipation ?o . 
+	?o pc:hasProperty ?prop .
+}
+
+CONSTRUCT { ?ts pc:hasProperty ?prop . ?prop rdf:type :PotentialIFProperty }
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording/co:hasParticipation/co:hasParticipantState ?o . 
+	?o pc:hasProperty ?prop .
+}
+
+CONSTRUCT { ?ts pc:hasProperty ?prop . ?prop rdf:type :PotentialIFProperty }
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording/co:hasParticipation/co:hasParticipantState/co:hasParticipant ?o . 
+	?o pc:hasProperty ?prop .
+}
+
+CONSTRUCT { ?ts pc:hasProperty ?prop . ?prop rdf:type :PotentialIFProperty }
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording/co:hasParticipation/co:hasActivityExecution ?o . 
+	?o pc:hasProperty ?prop .
+}
+
+# predefined properties of individuals connected with time series - IFs
+
+CONSTRUCT { 
+	?ts pc:hasProperty ?np . ?np rdf:type :PotentialIFProperty .
+	?np pc:hasKey ?pk . ?np pc:hasValue ?pv
+}
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording/co:hasParticipation/co:hasParticipantState/co:hasApperance ?a . 
+	?a ?p ?v .
+	FILTER ( ?p != rdf:type )
+	bind(IRI(concat(xsd:string(?ts),"_",spif:generateLabel(?p))) as ?np)
+	bind(str(?p) as ?pk)
+	bind(str(?v) as ?pv)
+}
+
+CONSTRUCT { 
+	?ts pc:hasProperty ?np . ?np rdf:type :PotentialIFProperty .
+	?np pc:hasKey ?pk . ?np pc:hasValue ?pv
+}
+WHERE { 
+	?ts rdf:type co:TimeSeries . 
+	?ts co:hasObservableInformation/co:hasRecording/co:hasParticipation/co:hasParticipantState/co:hasParticipant/co:hasSex ?c . 
+	bind(IRI(concat(xsd:string(?ts),"_hasSex")) as ?np)
+	bind(str(co:hasSex) as ?pk)
+	bind(str(?c) as ?pv)
+}
+
+# query 3.2.1 (condition 3) 
+# finding potential CVs with more than one value 
+
+SELECT DISTINCT ?cv
+WHERE { 
+	?prop rdf:type :PotentialCVProperty .
+	?prop pc:hasKey ?cv. ?prop pc:hasValue ?v 
+	FILTER (EXISTS { 
+		?prop2 rdf:type :PotentialCVProperty . 
+		?prop2 pc:hasKey ?cv. ?prop2 pc:hasValue ?v2
+		FILTER ( ?v != ?v2 )
+	} )
+}
+
+# query 3.2.1 (condition 3) 
+# finding potential IFs with more than one value 
+
+SELECT DISTINCT ?if
+WHERE { 
+	?prop rdf:type :PotentialIFProperty .
+	?prop pc:hasKey ?if. ?prop pc:hasValue ?v 
+	FILTER (EXISTS { 
+		?prop2 rdf:type :PotentialIFProperty . 
+		?prop2 pc:hasKey ?if. ?prop2 pc:hasValue ?v2
+		FILTER ( ?v != ?v2 )
+	} )
+}
+
+# query 3.2.1 (condition 3) 
+# the same query for finding potential CVs but returning user friendly names
+
+SELECT DISTINCT ?lab
+WHERE { 
+	?prop rdf:type :PotentialCVProperty .
+	?prop pc:hasKey ?cv. ?prop pc:hasValue ?v 
+	FILTER (EXISTS { 
+		?prop2 rdf:type :PotentialCVProperty . 
+		?prop2 pc:hasKey ?cv. ?prop2 pc:hasValue ?v2
+		FILTER ( ?v != ?v2 )
+	} )
+	bind( REPLACE( str( ?cv ), ".*#", "" ) as ?lab )
+}
+
+# query 3.2.2 
+# determining recognized emotional states, for which the consistency is analysed
+
+SELECT DISTINCT ?measureModel ?measureShortName
+WHERE { 
+	?ts rdf:type co:TimeSeries .
+	?ts co:hasMeasure ?measure.
+	?measure co:hasMeasureName ?measureName
+	bind( REPLACE( str( ?measureName ), ".*#", "" ) as ?measureShortName )
+    bind( REPLACE( str( ?measureName ), "#.*", "" ) as ?measureModel )
+}
+
+# dataset extraction (generic query)
+# general form of the query with the assumption that all the relevant properties
+# have been unifed
+
+SELECT DISTINCT ?measureShortName ?cv12 ?if1 ?if2 ...
+WHERE { 
+	?ts1 rdf:type co:TimeSeries . ?ts1 co:hasMeasure ?measure. ?measure co:hasMeasureName ?measureName.
+	?ts2 rdf:type co:TimeSeries . ?ts2 co:hasMeasure ?measure. 
+	bind( REPLACE( str( ?measureName ), ".*#", "" ) as ?measureShortName )
+	FILTER ( ?measureShortName IN ( [EMOTIONS TO RECOGNIZE] ) )
+	
+	?ts1 co:hasObservableInformation/co:hasRecording/co:hasParticipation ?p1 .
+	?ts2 co:hasObservableInformation/co:hasRecording/co:hasParticipation ?p1 .
+
+	?prop1 pc:hasKey [CONSISTENCY VARIABLE] .
+	?prop2 pc:hasKey [CONSISTENCY VARIABLE] .
+	?prop1 pc:hasValue ?cv1 .
+	?prop2 pc:hasValue ?cv2 .
+	FILTER ( str( ?cv1 ) < str( ?cv2 ) )
+	?ts1 pc:hasProperty ?prop1 .
+	?ts2 pc:hasProperty ?prop2 .
+	bind( concat( str( ?cv1 ), ":", str( ?cv2 ) ) as ?cv12 )
+
+	?ts1 co:timeSeriesSource ?tsn1. 
+	?ts2 co:timeSeriesSource ?tsn2. 	
+	FILTER ( str( ?tsn1 ) < str( ?tsn2 ) )
+
+    ?ts1 pc:hasProperty ?prop1if1 .
+	?ts2 pc:hasProperty ?prop2if1 .
+	?prop1if1 pc:hasKey [INCONSISTENCY FACTOR 1] .
+	?prop2if1 pc:hasKey [INCONSISTENCY FACTOR 1] .
+	?prop1if1 pc:hasValue ?if1 .
+	?prop2if1 pc:hasValue ?if1 .
+
+    ?ts1 pc:hasProperty ?prop1if2 .
+	?ts2 pc:hasProperty ?prop2if2 .
+	?prop1if2 pc:hasKey [INCONSISTENCY FACTOR 2] .
+	?prop2if2 pc:hasKey [INCONSISTENCY FACTOR 2] .
+	?prop1if2 pc:hasValue ?if2 .
+	?prop2if2 pc:hasValue ?if2 .
+	
+	[...]
+}
